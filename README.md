@@ -164,7 +164,7 @@ lambda_1 = aws_lambda.Function(self, "lambda-1",
                                     'ENV_REGION_NAME': REGION_NAME
                                       })
 ```
-Los parámetros son los estandars que generalmente configuramos cuando creamos una funcion Lambda por CLI o por la consola, y ademas le agregamos las variables de entorno:
+Los parámetros son los estándares que generalmente configuramos cuando creamos una función Lambda por CLI o por la consola, y además le agregamos las variables de entorno necesarias en el código de la lambda: 
 
 | Nombre | Valor | Descripcion |
 |---|---|---|
@@ -377,3 +377,5 @@ cdk destroy
 Puedes modificar la DynamoDB para que cada vez que un Items sea cargado lo envié a una Lambda u otro servicio AWS a través de la configuración propia Stream [Documentación](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_StreamRecord.html).
 
 En este GitHub puedes ver como hacerlo --> [https://github.com/cdk-patterns/serverless/tree/main/the-dynamo-streamer/python](https://github.com/cdk-patterns/serverless/tree/main/the-dynamo-streamer/python)
+
+## ¡¡Gracias por aprender conmigo :)!!
