@@ -23,7 +23,7 @@ cd s3_to_dynamo
 
 cdk init sample-app --language python
 ```
-Este ultimo comando te mostrará una breve descripción del ambiente además de los comandos necesarios para continuar con el despliegue de la APP (los cuales tambien se guardan en el [README.md](https://github.com/elizabethfuentes12/AWS_CDK_playground/s3_to_dynamo/README.md)) y también generará una serie de carpetas necesarias para que funcione el ambiente CDK
+Este ultimo comando te mostrará una breve descripción del ambiente además de los comandos necesarios para continuar con el despliegue de la APP (los cuales tambien se guardan en el [README.md](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/README.md)) y también generará una serie de carpetas necesarias para que funcione el ambiente CDK
 
 !["Archivos nuevos"](imagen/paso_2.png)
 
@@ -34,9 +34,9 @@ source .venv/bin/activate
 ```
 
 ### 4. Generamos nuestro codigo. 
-En el GitHub el codigo esta listo para desplegar, pero te voy a explicar brevemente en que consiste. 
+En el GitHub el codigo esta listo para desplegar, a continuación una breve explicación. 
 
-- El py "orquestador" de nuestra aplicación es el que se crea en el *** Paso 2 *** y su nombre se crea colocando al final del nombre de la carpeta la palabra ***_stack*** [s3_to_dynamo_stack.py](https://github.com/elizabethfuentes12/AWS_CDK_playground/s3_to_dynamo/s3_to_dynamo/s3_to_dynamo_stack.py)
+- El .py "orquestador" de nuestra aplicación se crea en el ***Paso 2*** con el nombre compuesto de la carpeta y la palabra ***_stack*** al final [s3_to_dynamo_stack.py](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/s3_to_dynamo/s3_to_dynamo_stack.py)
 
 
 - Creamos el bucket con el comando: 
@@ -89,7 +89,7 @@ lambda_1 = aws_lambda.Function(self, "lambda-1",
                                       })
 ```
 
-El codigo de esta lambda se encuentra en la carpeta [/lambda_1](https://github.com/elizabethfuentes12/AWS_CDK_playground/s3_to_dynamo/lambda_1/)
+El codigo de esta lambda se encuentra en la carpeta [/lambda_1](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/lambda_1)
 
 Le agregamos permiso para leer de S3 y se agrega el evento que la activara 
 
@@ -168,14 +168,14 @@ Para poder agregar el evento debemos tener en cuenta la siguiente librería:
 aws_lambda_event_sources
 ```
 
-El código de esta lambda se encuentra en la carpeta [/lambda_2](https://github.com/elizabethfuentes12/AWS_CDK_playground/s3_to_dynamo/lambda_2/)
+El código de esta lambda se encuentra en la carpeta [/lambda_2](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/lambda_2)
 
 ## ¡¡Felicidades!! ya estamos casi listos para desplegar nuestra aplicación
 
 
 ### 4. Instalamos los requerimientos para el ambiente de python 
 
-Para que el ambiente pueda funcionar, debemos agregar todas las librerías necesarias en el archivo  [requirements.txt](https://github.com/elizabethfuentes12/AWS_CDK_playground/s3_to_dynamo/requirements.txt)
+Para que el ambiente pueda funcionar, debemos agregar todas las librerías necesarias en el archivo  [requirements.txt](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/requirements.txt)
 
 Cuando se crea el archivo su contenido es el siguiente: 
 
@@ -229,7 +229,7 @@ Una vez finalizado el despligue puedes ver los recursos creados:
 
 ### 6. Prueba
 
-Para probar la aplicación busca el bucket en los recursos y agrega el archivo [ejemplo.csv](https://github.com/elizabethfuentes12/AWS_CDK_playground/ejemplo.csv)
+Para probar la aplicación busca el bucket en los recursos y agrega el archivo [ejemplo.csv](https://github.com/elizabethfuentes12/AWS_CDK_playground/blob/main/ejemplo.csv)
 
 Y en solo unos segundos puedes ver que tenemos el contenido del csv en la Tabla de DynamoDB
 
@@ -239,7 +239,7 @@ Y en solo unos segundos puedes ver que tenemos el contenido del csv en la Tabla 
 ### 7. Tips
 
 
-Puedes ver en que región se va a desplegar tu stack en el archivo [app.py](https://github.com/elizabethfuentes12/AWS_CDK_playground/s3_to_dynamo/app.py)
+Puedes ver en que región se va a desplegar tu stack en el archivo [app.py](https://github.com/elizabethfuentes12/AWS_CDK_playground/blob/main/s3_to_dynamo/app.py)
 
 
 !["paso_7"](imagen/paso_7.png)
