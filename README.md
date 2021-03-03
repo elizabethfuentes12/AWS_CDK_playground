@@ -274,7 +274,8 @@ event_source = aws_lambda_event_sources.SqsEventSource(
 Y le damos permiso para que pueda consumir los mensajes desde la cola, este comando también permite borrar mensajes, lo cual es importante para que una vez sea exitosa la función esta sea capaz de borrar el mensaje de la cola y no sea reintentado.
 
 !["paso_3"](imagen/paso_3.png)
-Revisa [Queue](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_sqs/Queue.html)
+
+Revisa más en [Queue](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_sqs/Queue.html)
 
 Y el comando es el siguiente: 
 
