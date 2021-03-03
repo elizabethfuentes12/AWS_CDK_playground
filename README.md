@@ -288,7 +288,7 @@ El código de esta lambda se encuentra en la carpeta [/lambda_2](https://github.
 ## ¡¡Felicidades!! ya estamos casi listos para desplegar nuestra aplicación
 
 
-### 4. Instalamos los requerimientos para el ambiente de python 
+### 5. Instalamos los requerimientos para el ambiente de python 
 
 Para que el ambiente pueda funcionar, debemos agregar todas las librerías CDK necesarias en el archivo  [requirements.txt](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/requirements.txt)
 
@@ -307,7 +307,7 @@ pip install -r requirements.txt
 ```
 Esto tardará algunos segundos. 
 
-### 5. Desplegando la aplicación
+### 6. Desplegando la aplicación
 
 Previo al despliegue de la aplicación en AWS Cloud debemos asegurarnos que este sin errores para que no salten errores durante el despliegue, eso lo hacemos con el siguiente comando:
 
@@ -342,7 +342,7 @@ Una vez finalizado el despligue puedes ver los recursos creados:
 !["paso_5"](imagen/paso_5_3.png)
 
 
-### 6. Prueba
+### 7. Prueba
 
 Para probar la aplicación busca el bucket en los recursos y agrega el archivo [ejemplo.csv](https://github.com/elizabethfuentes12/AWS_CDK_playground/blob/main/ejemplo.csv)
 
@@ -351,7 +351,7 @@ Y en solo unos segundos puedes ver que tenemos el contenido del csv en la Tabla 
 !["paso_6"](imagen/paso_6.png)
 
 
-### 7. Tips
+### 8. Tips
 
 
 Puedes ver en que región se va a desplegar tu stack en el archivo [app.py](https://github.com/elizabethfuentes12/AWS_CDK_playground/blob/main/s3_to_dynamo/app.py)
@@ -361,7 +361,7 @@ En el archivo [comandos.md](https://github.com/elizabethfuentes12/AWS_CDK_playgr
 !["paso_7"](imagen/paso_7.png)
 
 
-### 8. Eliminar el stack de la aplicación
+### 9. Eliminar el stack de la aplicación
 
 Para eliminar el stack lo puedes hacer via comando:
 
@@ -370,3 +370,9 @@ cdk destroy
 ```
 
 ó via consola en Delete. 
+
+### 10. Adicional
+
+Puedes modificar la DynamoDB para que cada vez que un Items sea cargado lo envié a una Lambda u otro servicio AWS a través de la configuración propia Stream [Documentación](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_streams_StreamRecord.html).
+
+En este GitHub puedes ver como hacerlo --> [https://github.com/cdk-patterns/serverless/tree/main/the-dynamo-streamer/python](https://github.com/cdk-patterns/serverless/tree/main/the-dynamo-streamer/python)
