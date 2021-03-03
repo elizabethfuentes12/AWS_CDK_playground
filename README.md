@@ -67,7 +67,7 @@ source .venv/bin/activate
 ```
 
 ### 4. Generamos nuestro codigo. 
-En el GitHub el codigo esta listo para desplegar, a continuación una breve explicación. 
+En el GitHub esta el código listo para desplegar, a continuación una breve explicación. 
 
 - El .py "orquestador" de nuestra aplicación se crea en el ***Paso 2*** con el nombre compuesto de la carpeta y la palabra ***_stack*** al final [s3_to_dynamo_stack.py](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/s3_to_dynamo/s3_to_dynamo_stack.py)
 
@@ -84,7 +84,8 @@ aws_s3 as s3
 Comando para crear el Bucket con sus respectivas politicas (opcional), en este caso usaremos DESTROY para que el bucket se elimine cuando eliminemos el stack. 
 
 ```
-bucket = s3.Bucket(self,"s3-dynamodb" ,  versioned=False, removal_policy=core.RemovalPolicy.DESTROY)
+bucket = s3.Bucket(self,"s3-dynamodb",
+        versioned=False, removal_policy=core.RemovalPolicy.DESTROY)
 ```
 Revisa mas de esta API en [Bucket](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_s3/Bucket.html)
 
