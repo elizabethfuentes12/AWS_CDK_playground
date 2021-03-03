@@ -329,7 +329,7 @@ Procedemos a desplegar la aplicación:
 cdk deploy
 ```
 
-Puedes ver el estado del despliegue en el terminal: 
+Para ver el estado del despliegue en el terminal: 
 
 !["paso_5"](imagen/paso_5.png)
 
