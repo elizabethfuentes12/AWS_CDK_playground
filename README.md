@@ -2,12 +2,45 @@
 
 # Crea un cargador de archivos CSV a DynamodB en menos de 5 minutos
 
-Este programa sencillo en CDK, pero extremadamente útil, te va a servir para que te introduzcas en el mundo de la programación CDK con python. 
+Últimamente he estado desarrollado algunas aplicaciones que han requerido alimentar una base de datos desde archivos CSV, por lo que se me ocurrió tener un stack de CDK listo para estas situaciones el cual les comparto. 
 
-## La Aplicación:
-Está aplicación será capaz de tomar un archivo CSV de un bucket y cargara su contenido en una tabla DynamodB. 
+En este tutorial les voy a enseñar como crear una aplicación sencilla en CDK con Python, pero extremadamente útil, que se encarga de leer un archivo .CSV de un bucket S3 con una Lambda (Lambda1), envía cada línea a SQS, la cual gatilla otra Lambda (Lambda2) que se encarga de escribir línea a línea en DynamoDB.
 
 !["Diagrama"](imagen/playground_1.jpg)
+
+Antes de empezar hablemos un poco de la teoría. 
+
+### S3 (Simple Storage Service):
+Es un servicio de almacenamiento de objetos que ofrece escalabilidad, disponibilidad de datos, seguridad y rendimiento líderes en el sector. 
+
+Conoce más acá: [S3](https://aws.amazon.com/es/s3/)
+
+### Lamdba: 
+AWS Lambda es un servicio informático sin servidor que le permite ejecutar código sin aprovisionar ni administrar servidores, crear una lógica de escalado de clústeres basada en la carga de trabajo, mantener integraciones de eventos o administrar tiempos de ejecución.
+
+Conoce más acá: [Lambda](https://aws.amazon.com/es/lambda/)
+
+### SQS (Simple Queue Service):
+Es un servicio de colas de mensajes completamente administrado que permite desacoplar y ajustar la escala de microservicios, sistemas distribuidos y aplicaciones sin servidor. SQS elimina la complejidad y los gastos generales asociados con la gestión y el funcionamiento del middleware orientado a mensajes, y permite a los desarrolladores centrarse en la diferenciación del trabajo.
+
+Conoce más acá: [SQS](https://aws.amazon.com/es/sqs/)
+
+### DynamoDB:
+Amazon DynamoDB es un servicio de base de datos de NoSQL completamente administrado que ofrece un desempeño rápido y predecible, así como una escalabilidad óptima. DynamoDB le permite reducir las cargas administrativas que supone tener que utilizar y escalar una base de datos distribuida, lo que le evita tener que preocuparse por el aprovisionamiento del hardware, la configuración y la configuración, la replicación, los parches de software o el escalado de clústeres.
+
+Conoce más acá: [DynamoDB](https://docs.aws.amazon.com/es_es/amazondynamodb/latest/developerguide/Introduction.html)
+
+### CDK (Cloud Development Kit): 
+El kit de desarrollo de la nube de AWS (AWS CDK) es un marco de desarrollo de software de código abierto que sirve para definir los recursos destinados a aplicaciones en la nube mediante lenguajes de programación conocidos.
+
+Una vez lo conozcas... no vas a querer desarrollar en AWS de otra forma ;) 
+
+Conoce más acá: [CDK](https://aws.amazon.com/es/cdk/?nc1=h_ls)
+
+
+## Para crear la aplicación debes seguir los siguientes pasos:
+
+Documentaticón CDK para Python [Link](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html)
 
 
 ### 1. Creemos la carpeta de nuestro proyecto. 
@@ -39,17 +72,26 @@ En el GitHub el codigo esta listo para desplegar, a continuación una breve expl
 - El .py "orquestador" de nuestra aplicación se crea en el ***Paso 2*** con el nombre compuesto de la carpeta y la palabra ***_stack*** al final [s3_to_dynamo_stack.py](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/s3_to_dynamo/s3_to_dynamo_stack.py)
 
 
-- Creamos el bucket con el comando: 
-```
-bucket = s3.Bucket(self,"s3-dynamodb" ,  versioned=False, removal_policy=core.RemovalPolicy.DESTROY)
-```
-Para que la creación sea exitosa se debe tener en cuenta la libreria que lo permita: 
+- Crear el bucket: 
 
+API Reference para [aws_cdk.aws_s3](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_s3.html)
+
+Debemos agregar el uso de la libreria de aws_s3
 ```
 aws_s3 as s3
 ```
 
-- Creamos el SQS que recibirá los mensajes de Lambda1: 
+Comando para crear el Bucket con sus respectivas politicas (opcional), en este caso usaremos DESTROY para que el bucket se elimine cuando eliminemos el stack. 
+
+```
+bucket = s3.Bucket(self,"s3-dynamodb" ,  versioned=False, removal_policy=core.RemovalPolicy.DESTROY)
+```
+Revisa mas de esta API en [Bucket](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_s3/Bucket.html)
+
+
+- Crear SQS que recibirá los mensajes de Lambda1: 
+
+API Reference para [aws_cdk.aws_sqs](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_sqs.html)
 
 Agregamos la libreria: 
 
@@ -57,25 +99,58 @@ Agregamos la libreria:
 aws_sqs as sqs
 ```
 
-Y creamos SQS con los siguientes comandos: 
+Para un mejor manejo de los mensajes, creamos la Queue, DeadLetterQueue y una Queue que almacene los mensajes fallidos. 
+
+API [Queue](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_sqs/Queue.html)
+
+Primero creamos la Queue de mensajes fallidos, ya que las otras dos le hacen mención.
+
+La nombramos "SQS-FAIL", visibility_timeout de 30 segundos
 
 ```
 queue_fail_SQS = sqs.Queue(
             self, "SQS-FAIL-", visibility_timeout=core.Duration.seconds(30))
+```
+
+A continuación creamos la Queue DeadLetterQueue, para donde se iran todos los mensajes fallidos de la Queue principal o "cola"
+
+API [DeadLetterQueue](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_sqs/DeadLetterQueue.html)
+
+max_receive_count: la cantidad máxima de veces que se procesa el mensaje para considerarlo como mensaje fallido.
+queue: Queue a donde van los mensajes luego de cumplir el máximo. 
+
+```
 dead_letter_SQS = sqs.DeadLetterQueue(
             max_receive_count=10, queue=queue_fail_SQS)
+```
+
+Por último, creamos la Queue (o cola), la nombramos "SQS-INI", visibility_timeout de 30 segundos y le indicamos que los mensajes sin procesar deben irse a la dead_letter_queue creada anteriormente.
+
+```
 queue_SQS = sqs.Queue(self, "SQS-INI-", visibility_timeout=core.Duration.seconds(
             30), dead_letter_queue=dead_letter_SQS)
 ```
 
-- Creamos la lambda que se gatilla con el archivo nuevo en el bucket:
+
+- Cream la lambda1 que es gatillada al cargar un archivo nuevo en el bucket y envia las linea que lee a una cola SQS:
+
+API [aws_lambda](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_lambda.html)
 
 Agregamos la libreria: 
 
 ```
 aws_lambda
 ```
-Creamos la Lambda con el siguiente comando, puedes notar que se le agrega la url de SQS en las variables de enntorno. 
+Creamos la Lambda con el siguiente comando
+API [Function](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_lambda/Function.html)
+
+Estas lambdas se gatillan con eventos, por lo cual debemos agregar la libreria que lo permite. 
+
+API [aws_lambda_event_sources](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_lambda_event_sources.html)
+
+```
+aws_lambda_event_sources
+```
 
 ```
 lambda_1 = aws_lambda.Function(self, "lambda-1",
@@ -88,22 +163,44 @@ lambda_1 = aws_lambda.Function(self, "lambda-1",
                                     'ENV_REGION_NAME': REGION_NAME
                                       })
 ```
+Los parámetros son los estandars que generalmente configuramos cuando creamos una funcion Lambda por CLI o por la consola, y ademas le agregamos las variables de entorno:
+
+| Nombre | Valor | Descripcion |
+|---|---|---|
+| ENV_SQS_QUEUE | queue_SQS.queue_url | Es la URL de la Queue |
+| ENV_REGION_NAME | Nombre de la region | Se requiere para defenir la Queue dentro de Lambda1 |
+
 
 El codigo de esta lambda se encuentra en la carpeta [/lambda_1](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/lambda_1)
 
-Le agregamos permiso para leer de S3 y se agrega el evento que la activara 
+***Para que se gatille al cargar un nuevo archivo en S3, debemos crear la notificación:***
 
-```
-        bucket.grant_read(lambda_1)   
-        notification = aws_s3_notifications.LambdaDestination(lambda_1)
-        bucket.add_event_notification(s3.EventType.OBJECT_CREATED, notification)
-```
 Agregamos la libreria que permite las notificaciones de S3: 
 
 ```
 aws_s3_notifications
 ```
-Esta lambda lee el archivo CSV y envia linea a linea a la SQS, por lo cual debemos crear la SQS darle los permisos correspondientes a la lamnda. 
+
+API [aws_cdk.aws_s3_notifications](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_s3_notifications/LambdaDestination.html)
+
+```
+notification = aws_s3_notifications.LambdaDestination(lambda_1)
+
+```
+Agregamos el evento a la Lambda e indicamos que este se debe gatillar cuando se crea un archivo en S3. 
+
+```
+bucket.add_event_notification(s3.EventType.OBJECT_CREATED, notification)
+```
+Y por supuesto le damos permiso a la Lambda1 para que pueda leer del bucket S3. 
+
+```
+bucket.grant_read(lambda_1)   
+```
+
+***Para que la lambda pueda escribir en la SQS definida se le debe dar permiso:*** 
+
+Con el siguiente comando
 
 ```
 queue_SQS.grant_send_messages(lambda_1)
@@ -113,10 +210,14 @@ queue_SQS.grant_send_messages(lambda_1)
 
 Agregamos la libreria: 
 
+API [aws_dynamodb](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_dynamodb.html)
+
 ```
 aws_dynamodb as ddb
 ```
 Creamos la tabla con los siguientes comandos: 
+
+API [Table](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_dynamodb/Table.html)
 
 ```
 ddb_table = ddb.Table(
@@ -125,7 +226,15 @@ ddb_table = ddb.Table(
             sort_key=ddb.Attribute(name="campo2", type=ddb.AttributeType.STRING),
             removal_policy=core.RemovalPolicy.DESTROY)
 ```
-Al igual que el bucket le activamos que se destruya al eliminar el stack. 
+Le agregamos los parametros al igual que por CLI o por la consola, y para nuestro ejemplo definimos las key.
+
+
+| Partition Key | Sort Key | Type |
+|---|---| ---|
+| campo1 | campo2 | string |
+
+Y para definimos RemovalPolicy como DESTROY para que se borre cuando se elimina el Stack de la aplicación. 
+
 
 - Creamos la lambda que se gatilla con la SQS y escribe en Tabla:
 
@@ -141,32 +250,37 @@ lambda_2 = aws_lambda.Function(self, "lambda_2",
                                           'ENV_REGION_NAME': REGION_NAME
                                       })
 ```
+La definimos igual que la anterior con la diferencia del nombre, la descripción y de la carpeta de donde tomara la función.
 
-
-Le damos permiso para escribir en la tabla
-
-```
-        ddb_table.grant_write_data(lambda_2)   
-        lambda_2.add_environment("TABLE_NAME_FINAL", ddb_table.table_name)
-```
-
-Permiso para leer de SQS en la tabla
-    
-```queue_SQS.grant_consume_messages(lambda_2)
-```
-
-EL evento que gatilla la lambda
-```
-        event_source = aws_lambda_event_sources.SqsEventSource(
-            queue_SQS, batch_size=1)
-        lambda_2.add_event_source(event_source) 
-```
-
-Para poder agregar el evento debemos tener en cuenta la siguiente librería:  
+Se le otorgan permisos para que pueda escribir en la tabla DynamoDB
 
 ```
-aws_lambda_event_sources
+ddb_table.grant_write_data(lambda_2)   
 ```
+Y para este caso, solo para mostrar, agregamos la variable de entorno para la DynamoDB con un comando aparte. 
+
+```
+lambda_2.add_environment("TABLE_NAME", ddb_table.table_name)
+```
+
+Lambda2 se gatilla con la recepción de mensajes desde la cola SQS, debemos crear y agregar el evento a la Lambda2:
+
+```
+event_source = aws_lambda_event_sources.SqsEventSource(
+    queue_SQS, batch_size=1)
+    lambda_2.add_event_source(event_source) 
+```
+Y le damos permiso para que pueda consumir los mensajes desde la cola, este comando también permite borrar mensajes, lo cual es importante para que una vez sea exitosa la función esta sea capaz de borrar el mensaje de la cola y no sea reintentado.
+
+!["paso_3"](imagen/paso_3.png)
+Revisa [Queue](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_sqs/Queue.html)
+
+Y el comando es el siguiente: 
+
+```
+queue_SQS.grant_consume_messages(lambda_2)
+```
+
 
 El código de esta lambda se encuentra en la carpeta [/lambda_2](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/lambda_2)
 
@@ -175,7 +289,7 @@ El código de esta lambda se encuentra en la carpeta [/lambda_2](https://github.
 
 ### 4. Instalamos los requerimientos para el ambiente de python 
 
-Para que el ambiente pueda funcionar, debemos agregar todas las librerías necesarias en el archivo  [requirements.txt](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/requirements.txt)
+Para que el ambiente pueda funcionar, debemos agregar todas las librerías CDK necesarias en el archivo  [requirements.txt](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/requirements.txt)
 
 Cuando se crea el archivo su contenido es el siguiente: 
 
