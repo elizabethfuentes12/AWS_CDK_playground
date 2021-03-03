@@ -6,7 +6,7 @@ with open("README.md") as fp:
 
 
 setuptools.setup(
-    name="cdkworkshop",
+    name="s3_to_dynamo",
     version="0.0.1",
 
     description="A sample CDK Python app",
@@ -15,8 +15,8 @@ setuptools.setup(
 
     author="author",
 
-    package_dir={"": "cdkworkshop"},
-    packages=setuptools.find_packages(where="cdkworkshop"),
+    package_dir={"": "s3_to_dynamo"},
+    packages=setuptools.find_packages(where="s3_to_dynamo"),
 
     install_requires=[
         "aws-cdk.core==1.91.0",

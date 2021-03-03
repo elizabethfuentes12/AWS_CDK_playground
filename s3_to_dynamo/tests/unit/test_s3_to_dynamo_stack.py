@@ -2,13 +2,13 @@ import json
 import pytest
 
 from aws_cdk import core
-from cdkworkshop.cdkworkshop_stack import CdkworkshopStack
+from s3_to_dynamo.s3_to_dynamo_stack import S3ToDynamoStack
 
 
 def get_template():
     app = core.App()
-    CdkworkshopStack(app, "cdkworkshop")
-    return json.dumps(app.synth().get_stack("cdkworkshop").template)
+    S3ToDynamoStack(app, "s3-to-dynamo")
+    return json.dumps(app.synth().get_stack("s3-to-dynamo").template)
 
 
 def test_sqs_queue_created():
