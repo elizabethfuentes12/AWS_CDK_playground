@@ -241,6 +241,7 @@ Y en solo unos segundos puedes ver que tenemos el contenido del csv en la Tabla 
 
 Puedes ver en que región se va a desplegar tu stack en el archivo [app.py](https://github.com/elizabethfuentes12/AWS_CDK_playground/blob/main/s3_to_dynamo/app.py)
 
+En el archivo [comandos.md](https://github.com/elizabethfuentes12/AWS_CDK_playground/blob/main/comandos.md) esta el resumen de los comandos CDK utilizados. 
 
 !["paso_7"](imagen/paso_7.png)
 
