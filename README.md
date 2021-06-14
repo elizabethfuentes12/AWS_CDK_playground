@@ -4,20 +4,20 @@
 
 Últimamente he estado desarrollado algunas aplicaciones que han requerido alimentar una base de datos DynamoDB desde archivos CSV. Por esto se me ocurrió generar una pequeña aplicación serverless utilizando CDK lista para estas situaciones. Les comparto esta aplicación para sus proyectos.
 
-En este tutorial vamos a ver como crear una aplicación sencilla en CDK con Python, pero extremadamente útil. Como se ve en la siguiente imagen, cada vez que se sube un archivo al bucket, un evento invoca una función Lambda (Lambda1) que se encarga de leer el archivo .CSV del bucket, envía cada línea como un mensaje a una cola SQS. Esta cola tiene otro desencadenador que invoca otra functión Lambda (Lambda2) que toma el mensaje y los escribe como un ítem de una tabla DynamoDB.
+En este tutorial vamos a ver como crear una aplicación sencilla en CDK con Python, pero extremadamente útil. Como se ve en la siguiente imagen, cada vez que se sube un archivo al bucket, un evento invoca una función Lambda (Lambda1) que se encarga de leer el archivo .CSV del bucket, envía cada línea como un mensaje a una cola SQS. Esta cola tiene otro desencadenador que invoca otra función Lambda (Lambda2) que toma el mensaje y los escribe como un ítem de una tabla DynamoDB.
 
 !["Diagrama"](imagen/playground_1.jpg)
 
 Los servicios involucrados en esta solución son:
 
 ### Amazon S3 (Simple Storage Service):
-[S3](https://aws.amazon.com/es/s3/) es un servicio de almacenamiento de objetos que ofrece escalabilidad, disponibilidad de datos y seguridad. 
+[S3](https://aws.amazon.com/es/s3/) es un servicio de computo sin servidor que le permite ejecutar código sin aprovisionar ni administrar servidores.
 
 ### AWS Lamdba: 
 AWS [Lambda](https://aws.amazon.com/es/lambda/) es un servicio de computo sin servidor que le permite ejecutar código sin aprovisionar ni administrar servidores, 
 
 ### Amazon SQS (Simple Queue Service):
-[SQS](https://aws.amazon.com/es/sqs/) Es un servicio de colas de mensajes completamente administrado que permite desacoplar y ajustar la escala de microservicios, sistemas distribuidos y aplicaciones serverless. 
+[SQS](https://aws.amazon.com/es/sqs/) Es un servicio de colas de mensajes completamente administrado que permite desacoplar y ajustar la escala de microservicios, sistemas distribuidos y aplicaciones serverless.
  
 ### Amazon DynamoDB:
 Amazon [DynamoDB](https://docs.aws.amazon.com/es_es/amazondynamodb/latest/developerguide/Introduction.html) es un servicio de base de datos de NoSQL completamente administrado que ofrece un desempeño rápido y predecible, así como una escalabilidad óptima. DynamoDB le permite reducir las cargas administrativas que supone tener que utilizar y escalar una base de datos distribuida, lo que le evita tener que preocuparse por el aprovisionamiento del hardware, la configuración y la configuración, la replicación, los parches de software o el escalado de clústeres.
@@ -26,7 +26,7 @@ Amazon [DynamoDB](https://docs.aws.amazon.com/es_es/amazondynamodb/latest/develo
 ### CDK (Cloud Development Kit): 
 El kit de desarrollo de la nube de AWS (AWS CDK) es un framework de código abierto que sirve para definir los recursos destinados a aplicaciones en la nube mediante lenguajes de programación conocidos.
 
-Una vez lo conozcas... no vas a querer desarrollar aplicaciones en AWS de otra forma ;) 
+Una vez lo conozcas... no vas a querer desarrollar aplicaciones en AWS de otra forma ;)
 
 Conoce más acá: [CDK](https://aws.amazon.com/es/cdk/?nc1=h_ls)
 
@@ -39,9 +39,9 @@ Conoce más acá: [CDK](https://aws.amazon.com/es/cdk/?nc1=h_ls)
 
 Para realizar el despliegue de los recursos, debes instalar y configurar la cli (command line interface) de CDK, en este caso estamos utilizando CDK con Python.
 
-[Instalacion y configuración de CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html)
+[Instalación y configuración de CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html)
 
-[Documentaticón CDK para Python](https://docs.aws.amazon.com/cdk/api/latest/python/index.html)
+[Documentación CDK para Python](https://docs.aws.amazon.com/cdk/api/latest/python/index.html)
 
 
 ### 2. Clonamos el repo y vamos la carpeta de nuestro proyecto. 
@@ -51,14 +51,14 @@ git clone https://github.com/elizabethfuentes12/AWS_CDK_playground
 cd AWS_CDK_playground/s3_to_dynamo
 ```
 
-### 3. creamos e iniciamos el ambiente virtual
+### 3. Creamos e iniciamos el ambiente virtual
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-Este ambiente virtual (venv) nos permite aislar las version del python que vamos a utilizar como también de librerías asociadas. Con esto podemos tener varios proyectos con distintas configuraciones.
+Este ambiente virtual (venv) nos permite aislar las versiones del python que vamos a utilizar como también de librerías asociadas. Con esto podemos tener varios proyectos con distintas configuraciones.
 ___
 ## 4. Explicación del codigo
 En el GitHub esta el código listo para desplegar, a continuación una breve explicación:
@@ -86,7 +86,7 @@ Comando para crear el Bucket con sus respectivas politicas (opcional), en este c
 Revisa mas de esta API en [Bucket](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_s3/Bucket.html)
 
 
-### Crear SQS que recibirá los mensajes de Lambda1: 
+### Crear SQS que recibirá los mensajes de Lambda1: 
 
 API Reference para [aws_cdk.aws_sqs](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_sqs.html)
 
@@ -117,10 +117,10 @@ API [DeadLetterQueue](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.
 
 
 
-Luego de esto creamo la una funcion lambda  que es gatillada al cargar un archivo nuevo en el bucket y envia las linea que lee a una cola SQS:
+Luego de esto creamos la una función lambda que es gatillada al cargar un archivo nuevo en el bucket y envía las linea que lee a una cola SQS:
 
 
-### Funcion Lambda1: 
+### Función Lambda1: 
 
 API [aws_lambda](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_lambda.html)
 
@@ -141,7 +141,7 @@ lambda_1 = aws_lambda.Function(
 Creamos la Lambda con el siguiente comando
 API [Function](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_lambda/Function.html)
 
-Estas lambdas se gatillan con eventos, por lo cual debemos agregar la libreria que lo permite. 
+Estas lambdas se gatillan con eventos, por lo cual debemos agregar la librería que lo permite. 
 
 API [aws_lambda_event_sources](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_lambda_event_sources.html)
 
@@ -154,11 +154,11 @@ Los parámetros son los estándares que generalmente configuramos cuando creamos
 | ENV_REGION_NAME | Nombre de la region | Opcional si se requiere para defenir la Queue dentro de Lambda1 |
 
 
-El codigo python que ejecuta esta lambda se encuentra en la carpeta [/lambda_1](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/lambda_1)
+El código python que ejecuta esta lambda se encuentra en la carpeta [/lambda_1](https://github.com/elizabethfuentes12/AWS_CDK_playground/tree/main/s3_to_dynamo/lambda_1)
 
 
 
-### Trigger de nuevo objeto en el bucket. 
+### Trigger de nuevo objeto en el bucket. 
 
 ```python
 import aws_s3_notifications
@@ -185,7 +185,7 @@ API [aws_cdk.aws_s3_notifications](https://docs.aws.amazon.com/cdk/api/latest/py
 
 API [aws_dynamodb](https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_dynamodb.html)
 
-Le agregamos los parametros al igual que por CLI o por la consola, y para nuestro ejemplo definimos las key.
+Le agregamos los parámetros al igual que por CLI o por la consola, y para nuestro ejemplo definimos las key.
 
 
 | Tipo de Key| Key name | Type |
@@ -232,7 +232,7 @@ ddb_table.grant_write_data(lambda_2)
 lambda_2.add_environment("TABLE_NAME", ddb_table.table_name)
 ```
 
-La definimos igual que la anterior con la diferencia del nombre, la descripción y de la carpeta de donde tomara la función.
+La definimos igual que la anterior con la diferencia del nombre, la descripción y de la carpeta donde tomara la función.
 
 
 
@@ -319,9 +319,9 @@ Ya que usamos una cola de mensajes no nos preocupa la cantidad de elementos. Tod
 ### 8. Tips
 
 
-Puedes ver en que región se va a desplegar tu stack en el archivo [app.py](https://github.com/elizabethfuentes12/AWS_CDK_playground/blob/main/s3_to_dynamo/app.py) entonces puedes desplegar en otras regiones. 
+Puedes ver en cual región se va a desplegar tu stack en el archivo [app.py](https://github.com/elizabethfuentes12/AWS_CDK_playground/blob/main/s3_to_dynamo/app.py) entonces puedes desplegar en otras regiones. 
 
-
+c
 !["paso_7"](imagen/paso_7.png)
 
 
